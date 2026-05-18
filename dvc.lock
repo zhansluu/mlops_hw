@@ -1,0 +1,108 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python scripts/train.py
+    deps:
+    - path: data/Test_1
+      hash: md5
+      md5: 62c3780e5c19bc53638a42e202acda77.dir
+      size: 229951307
+      nfiles: 3998
+    - path: data/Train_1
+      hash: md5
+      md5: be4fba47d09ac1e4ff93610c7ce22370.dir
+      size: 577186450
+      nfiles: 9994
+    - path: scripts/train.py
+      hash: md5
+      md5: ec845cf6c11fbde65abbe4690b15af8d
+      size: 7527
+    params:
+      params.yaml:
+        base_training:
+          num_epochs: 10
+          batch_size: 32
+          learning_rate: 0.001
+          scheduler_step_size: 5
+          scheduler_gamma: 0.1
+          num_workers: 4
+          img_size: 224
+          num_classes: 2
+          model_name: resnet18
+          train_csv: data/Train_1/train.csv
+          train_data_dir: data/Train_1
+          test_csv: data/Test_1/test.csv
+          test_data_dir: data/Test_1
+          model_save_path: models/model_v1.pth
+          log_dir: logs/base_training
+        s3:
+          endpoint_url: http://localhost:9000
+          access_key: minioadmin
+          secret_key: minioadmin
+          bucket: mlops-models
+          model_v1_key: models/model_v1.pth
+          model_v2_key: models/model_v2.pth
+    outs:
+    - path: models/metrics_v1.json
+      hash: md5
+      md5: 90f6cc976d089c4e404cb4e850242fe2
+      size: 187
+    - path: models/model_v1.pth
+      hash: md5
+      md5: eef8a29b69d09a9817bbe45b84cf30ba
+      size: 44787787
+  finetune:
+    cmd: python scripts/finetune.py
+    deps:
+    - path: data/Test_2
+      hash: md5
+      md5: be5492c21e2dec84056e1599a807ccd1.dir
+      size: 114391042
+      nfiles: 2001
+    - path: data/Train_2
+      hash: md5
+      md5: cd8edb58d893e35241fdf8fbf6049229.dir
+      size: 229344118
+      nfiles: 3998
+    - path: models/model_v1.pth
+      hash: md5
+      md5: eef8a29b69d09a9817bbe45b84cf30ba
+      size: 44787787
+    - path: scripts/finetune.py
+      hash: md5
+      md5: 4c82b143be7cbf0b52d38e4f879564d0
+      size: 8092
+    params:
+      params.yaml:
+        finetune:
+          num_epochs: 5
+          batch_size: 32
+          learning_rate: 0.0001
+          scheduler_step_size: 3
+          scheduler_gamma: 0.1
+          num_workers: 4
+          img_size: 224
+          num_classes: 2
+          train_csv: data/Train_2/train.csv
+          train_data_dir: data/Train_2
+          test_csv: data/Test_2/test.csv
+          test_data_dir: data/Test_2
+          base_model_path: models/model_v1.pth
+          model_save_path: models/model_v2.pth
+          log_dir: logs/finetune
+        s3:
+          endpoint_url: http://localhost:9000
+          access_key: minioadmin
+          secret_key: minioadmin
+          bucket: mlops-models
+          model_v1_key: models/model_v1.pth
+          model_v2_key: models/model_v2.pth
+    outs:
+    - path: models/metrics_v2.json
+      hash: md5
+      md5: 3bc3a770e395f3481590fef5073eaf87
+      size: 161
+    - path: models/model_v2.pth
+      hash: md5
+      md5: a343aa22540075530b756895c11a4f21
+      size: 44787787

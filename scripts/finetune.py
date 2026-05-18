@@ -20,12 +20,23 @@ class ImageDataset(Dataset):
         self.data = pd.read_csv(csv_file)
         self.root_dir = Path(root_dir)
         self.transform = transform
+        self.img_dir = self._find_img_dir()
+        print(f'Папка с картинками: {self.img_dir}')
+
+    def _find_img_dir(self):
+        for folder in ['train_data', 'test_data', 'data']:
+            path = self.root_dir / folder
+            if path.exists():
+                return path
+        return self.root_dir
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
-        img_path = self.root_dir / self.data.iloc[idx]['file_name']
+        raw_path = self.data.iloc[idx]['file_name']
+        filename = Path(raw_path).name
+        img_path = self.img_dir / filename
         image = Image.open(img_path).convert('RGB')
         label = self.data.iloc[idx]['label']
         if self.transform:
@@ -117,6 +128,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
 
+    Path(cfg['log_dir']).mkdir(parents=True, exist_ok=True)
     writer = SummaryWriter(log_dir=cfg['log_dir'])
     writer.add_text('hyperparameters', str(cfg))
 
@@ -146,7 +158,7 @@ def main():
 
     print(f'Train: {len(train_dataset)}, Test: {len(test_dataset)}')
 
-    model = models.resnet18(pretrained=False)
+    model = models.resnet18(weights=None)
     model.fc = nn.Linear(model.fc.in_features, cfg['num_classes'])
     model.load_state_dict(torch.load(cfg['base_model_path'], map_location=device))
     model = model.to(device)
@@ -204,7 +216,7 @@ def main():
     }
     with open('models/metrics_v2.json', 'w') as f:
         json.dump(metrics, f, indent=2)
-    print('Метрики:', metrics)
+    print('Метрики v2:', metrics)
 
     upload_to_s3(cfg['model_save_path'], s3_cfg)
 
