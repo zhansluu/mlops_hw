@@ -1,0 +1,13 @@
+
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+.venv/
+
+models/*.pth
+
+logs/
+
+data/ai-vs-human-generated-dataset-hw/

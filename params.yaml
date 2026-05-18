@@ -1,0 +1,41 @@
+base_training:
+  num_epochs: 10
+  batch_size: 32
+  learning_rate: 0.001
+  scheduler_step_size: 5
+  scheduler_gamma: 0.1
+  num_workers: 4
+  img_size: 224
+  num_classes: 2
+  model_name: resnet18
+  train_csv: data/Train_1/train.csv
+  train_data_dir: data/Train_1
+  test_csv: data/Test_1/test.csv
+  test_data_dir: data/Test_1
+  model_save_path: models/model_v1.pth
+  log_dir: logs/base_training
+
+finetune:
+  num_epochs: 5
+  batch_size: 32
+  learning_rate: 0.0001
+  scheduler_step_size: 3
+  scheduler_gamma: 0.1
+  num_workers: 4
+  img_size: 224
+  num_classes: 2
+  train_csv: data/Train_2/train.csv
+  train_data_dir: data/Train_2
+  test_csv: data/Test_2/test.csv
+  test_data_dir: data/Test_2
+  base_model_path: models/model_v1.pth
+  model_save_path: models/model_v2.pth
+  log_dir: logs/finetune
+
+s3:
+  endpoint_url: http://localhost:9000
+  access_key: minioadmin
+  secret_key: minioadmin
+  bucket: mlops-models
+  model_v1_key: models/model_v1.pth
+  model_v2_key: models/model_v2.pth

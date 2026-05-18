@@ -1,0 +1,33 @@
+stages:
+  train:
+    cmd: python scripts/train.py
+    deps:
+      - scripts/train.py
+      - data/Train_1
+      - data/Test_1
+    params:
+      - params.yaml:
+          - base_training
+          - s3
+    outs:
+      - models/model_v1.pth
+    metrics:
+      - models/metrics_v1.json:
+          cache: false
+
+  finetune:
+    cmd: python scripts/finetune.py
+    deps:
+      - scripts/finetune.py
+      - models/model_v1.pth
+      - data/Train_2
+      - data/Test_2
+    params:
+      - params.yaml:
+          - finetune
+          - s3
+    outs:
+      - models/model_v2.pth
+    metrics:
+      - models/metrics_v2.json:
+          cache: false
