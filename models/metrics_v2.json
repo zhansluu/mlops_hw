@@ -1,7 +1,7 @@
 {
-  "test_loss": 0.08109804540872574,
-  "test_accuracy": 0.9725,
-  "test_f1": 0.9724947804539786,
-  "test_precision": 0.97274698363517,
-  "test_recall": 0.9725
+  "test_loss": 0.07182810465991497,
+  "test_accuracy": 0.9785,
+  "test_f1": 0.9784999408732113,
+  "test_precision": 0.9785003710133565,
+  "test_recall": 0.9785
 }
